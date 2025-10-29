@@ -13,11 +13,11 @@ permissions:
 # NOTE: All models now require inference profile format (us. prefix)
 env:
   # Primary model (uncomment one):
-  MODEL_ID: us.anthropic.claude-3-5-sonnet-20241022-v2:0  # Claude 3.5 Sonnet V2 (CURRENT - working)
-  # MODEL_ID: us.anthropic.claude-sonnet-4-20250514-v1:0  # Claude Sonnet 4 (uncomment when subscription ready)
+  MODEL_ID: us.anthropic.claude-3-5-sonnet-20241022-v2:0  # Claude 3.5 Sonnet V2 (CURRENT - better quality)
+  # MODEL_ID: us.anthropic.claude-3-5-sonnet-20240620-v1:0  # Claude 3.5 Sonnet V1 (legacy)
+  # MODEL_ID: us.anthropic.claude-sonnet-4-20250514-v1:0  # Claude Sonnet 4 (needs subscription)
 
   # Alternative models (for testing):
-  # MODEL_ID: us.anthropic.claude-3-5-sonnet-20240620-v1:0  # Claude 3.5 Sonnet V1
   # MODEL_ID: us.anthropic.claude-3-haiku-20240307-v1:0     # Claude 3 Haiku (faster/cheaper)
   # MODEL_ID: us.anthropic.claude-3-5-haiku-20241022-v1:0   # Claude 3.5 Haiku (newest fast model)
 
