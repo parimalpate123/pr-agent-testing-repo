@@ -22,7 +22,7 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
-          model: anthropic.claude-sonnet-4-20250514-v1:0
+          model: us.anthropic.claude-sonnet-4-20250514-v1:0
           bedrock_region: us-east-1
           max_tokens: "25000"
           timeout_minutes: "30"
