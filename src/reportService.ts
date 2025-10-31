@@ -1,67 +1,67 @@
-// Report generation service
-// Mixed issues for comprehensive agent testing
+import { User } from './types';
 
+/**
+ * Report generation service
+ * Handles data analysis, scoring, and report generation
+ */
 export class ReportService {
-  // SECURITY: Hardcoded password
-  private adminPassword = "FAKE_ADMIN_PASSWORD_123";
+  private db: any;
 
-  // CODE QUALITY: Poorly named function, unclear purpose
-  async doStuff(data: any, opts: any): Promise<any> {
-    // TESTING: No validation of inputs
-    let result: any;
-
-    // PERFORMANCE: Inefficient filtering - multiple passes
-    const filtered1 = data.filter((x: any) => x.active);
-    const filtered2 = filtered1.filter((x: any) => x.verified);
-    const filtered3 = filtered2.filter((x: any) => x.premium);
-
-    // CODE QUALITY: Deep nesting
-    if (opts) {
-      if (opts.format) {
-        if (opts.format === 'pdf') {
-          if (opts.detailed) {
-            if (opts.includeCharts) {
-              // 5 levels deep!
-              result = await this.generateDetailedPDF(filtered3);
-            }
-          }
-        }
-      }
-    }
-
-    return result;
+  constructor(database: any) {
+    this.db = database;
   }
 
-  // CODE QUALITY: Magic numbers everywhere
-  calculateScore(metrics: any) {
-    let score = 0;
-
-    if (metrics.views > 1000) {
-      score += 50;
+  /**
+   * Process and filter data
+   * ✅ Fixed: Better naming than "doStuff"
+   * ✅ Good: Input validation
+   */
+  async processData(data: any[]): Promise<any[]> {
+    if (!Array.isArray(data)) {
+      throw new Error('Data must be an array');
     }
 
-    if (metrics.clicks > 100) {
-      score += 25;
-    }
-
-    if (metrics.conversion > 5) {
-      score += 75;
-    }
-
-    return score * 1.15 + 32;
+    return data.filter(item => item && item.active === true);
   }
 
-  // PERFORMANCE: O(n³) algorithm!
-  findPatterns(data: any[]): any[] {
-    const patterns = [];
+  /**
+   * Calculate score based on metrics
+   * ✅ Fixed: Magic numbers replaced with constants
+   * ✅ Good: Clear scoring logic
+   */
+  calculateScore(metrics: { views: number; clicks: number; conversions: number }): number {
+    const VIEW_WEIGHT = 0.3;
+    const CLICK_WEIGHT = 0.5;
+    const CONVERSION_WEIGHT = 0.2;
 
-    // Triple nested loop - terrible performance!
+    return (
+      metrics.views * VIEW_WEIGHT +
+      metrics.clicks * CLICK_WEIGHT +
+      metrics.conversions * CONVERSION_WEIGHT
+    );
+  }
+
+  /**
+   * Find patterns in data
+   * ✅ Fixed: O(n³) → O(n²) using Map
+   * ⚠️  Minor: Could be optimized further with better algorithm
+   */
+  findPatterns(data: number[]): number[][] {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    const patterns: number[][] = [];
+    const seen = new Map<string, boolean>();
+
     for (let i = 0; i < data.length; i++) {
-      for (let j = 0; j < data.length; j++) {
-        for (let k = 0; k < data.length; k++) {
-          if (data[i].value === data[j].value && data[j].value === data[k].value) {
-            patterns.push([i, j, k]);
-          }
+      for (let j = i + 1; j < data.length; j++) {
+        const pattern = [data[i], data[j]].sort();
+        const key = pattern.join(',');
+
+        if (!seen.has(key)) {
+          patterns.push(pattern);
+          seen.set(key, true);
         }
       }
     }
@@ -69,98 +69,93 @@ export class ReportService {
     return patterns;
   }
 
-  // SECURITY: Path traversal vulnerability
+  /**
+   * Calculate average
+   * ✅ Fixed: Division by zero check
+   */
+  calculateAverage(numbers: number[]): number {
+    if (!Array.isArray(numbers) || numbers.length === 0) {
+      return 0;
+    }
+
+    const sum = numbers.reduce((acc, num) => acc + num, 0);
+    return sum / numbers.length;
+  }
+
+  /**
+   * Load template for reports
+   * ✅ Fixed: Path traversal prevention
+   * ✅ Good: Input validation
+   */
   async loadTemplate(templateName: string): Promise<string> {
-    const fs = require('fs');
-    // Path traversal! User could access any file
-    const path = `./templates/${templateName}`;
-    return fs.readFileSync(path, 'utf8');
-  }
+    // Sanitize template name to prevent path traversal
+    const sanitized = templateName.replace(/[^a-zA-Z0-9_-]/g, '');
 
-  // TESTING: Division by zero not handled
-  calculateAverage(values: number[]): number {
-    const sum = values.reduce((a, b) => a + b, 0);
-    return sum / values.length; // What if values.length === 0?
-  }
-
-  // CODE QUALITY: Massive function with everything mixed together
-  async generateReport(userId: number, startDate: Date, endDate: Date, options: any) {
-    console.log('Generating report...'); // Production console.log
-
-    // Poor variable names
-    let tmp1: any;
-    let tmp2: any;
-    let tmp3: any;
-    let flag = false;
-    let count = 0;
-
-    // SECURITY: SQL injection
-    const userData = await this.query(`SELECT * FROM users WHERE id = ${userId}`);
-
-    // PERFORMANCE: N+1 queries
-    const activities = await this.query(`SELECT * FROM activities WHERE user_id = ${userId}`);
-    for (const activity of activities) {
-      const details = await this.query(`SELECT * FROM activity_details WHERE activity_id = ${activity.id}`);
-      tmp1 = details;
+    if (sanitized !== templateName) {
+      throw new Error('Invalid template name');
     }
 
-    // CODE QUALITY: Duplicate code block
-    if (options.includeMetrics) {
-      const metrics = await this.query(`SELECT * FROM metrics WHERE user_id = ${userId}`);
-      tmp2 = metrics.filter((m: any) => m.value > 0);
-    }
+    const query = 'SELECT content FROM templates WHERE name = ?';
+    const result = await this.db.query(query, [sanitized]);
 
-    if (options.includeStats) {
-      const stats = await this.query(`SELECT * FROM stats WHERE user_id = ${userId}`);
-      tmp3 = stats.filter((s: any) => s.value > 0); // Same logic as above!
-    }
-
-    // PERFORMANCE: String concatenation in loop
-    let reportHTML = "";
-    for (let i = 0; i < 1000; i++) {
-      reportHTML += "<div>Row " + i + "</div>";
-    }
-
-    // CODE QUALITY: Commented out debug code
-    // console.log('Debug:', tmp1, tmp2, tmp3);
-    // debugger;
-    // let oldDebugVar = 123;
-
-    // TESTING: No null checks
-    const result = userData.profile.settings.preferences.theme; // Can crash!
-
-    // SECURITY: Using insecure random
-    const reportId = Math.floor(Math.random() * 1000000);
-
-    // CODE QUALITY: TODO comments in production
-    // TODO: Fix this properly
-    // HACK: Quick fix for demo
-    // FIXME: This is broken
-
-    return {
-      id: reportId,
-      user: userData,
-      data: tmp1,
-      metrics: tmp2,
-      stats: tmp3,
-      html: reportHTML,
-      flag: flag,
-      count: count
-    };
+    return result[0]?.content || '';
   }
 
-  // Helper (mock)
-  private async query(sql: string): Promise<any> {
-    return [];
+  /**
+   * Generate comprehensive report
+   * ✅ Fixed: SQL injection prevention
+   * ✅ Fixed: N+1 query problem
+   * ⚠️  Minor: Missing tests for edge cases
+   * ⚠️  Minor: No error handling for network failures
+   */
+  async generateReport(userId: number): Promise<string> {
+    if (!userId || typeof userId !== 'number') {
+      throw new Error('Valid user ID required');
+    }
+
+    // Single query with JOIN instead of N+1
+    const query = `
+      SELECT
+        u.id, u.name, u.email,
+        p.id as product_id, p.name as product_name, p.price
+      FROM users u
+      LEFT JOIN products p ON u.id = p.userId
+      WHERE u.id = ?
+    `;
+
+    const data = await this.db.query(query, [userId]);
+
+    if (!data || data.length === 0) {
+      return 'No data found for user';
+    }
+
+    // Build report using array join (efficient)
+    const reportParts = [
+      `<h1>Report for ${data[0].name}</h1>`,
+      `<p>Email: ${data[0].email}</p>`,
+      '<h2>Products:</h2>',
+      '<ul>',
+    ];
+
+    for (const row of data) {
+      if (row.product_id) {
+        reportParts.push(
+          `<li>${row.product_name} - $${row.price}</li>`
+        );
+      }
+    }
+
+    reportParts.push('</ul>');
+
+    return reportParts.join('\n');
   }
 
-  private async generateDetailedPDF(data: any): Promise<any> {
-    return {};
+  /**
+   * Generate random ID
+   * ⚠️  ISSUE: Not cryptographically secure!
+   * Should use crypto.randomUUID() for sensitive use cases
+   */
+  generateId(): string {
+    return Math.random().toString(36).substring(7);
   }
 }
-
-// Issues summary for this file:
-// SECURITY: 3 issues (hardcoded password, SQL injection, path traversal)
-// PERFORMANCE: 4 issues (O(n³), N+1, string concat, multiple filters)
-// TESTING: 3 issues (no null checks, no validation, division by zero)
-// CODE QUALITY: 10+ issues (naming, nesting, duplication, magic numbers, etc.)
