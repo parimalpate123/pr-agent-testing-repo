@@ -1,4 +1,5 @@
 import { User } from './types';
+import crypto from 'crypto';
 
 /**
  * Report generation service
@@ -152,10 +153,10 @@ export class ReportService {
 
   /**
    * Generate random ID
-   * ⚠️  ISSUE: Not cryptographically secure!
-   * Should use crypto.randomUUID() for sensitive use cases
+   * ✅ Fixed: Using crypto.randomUUID() for cryptographic security
    */
   generateId(): string {
-    return Math.random().toString(36).substring(7);
+    // Use Node.js crypto module for cryptographically secure random IDs
+    return crypto.randomUUID();
   }
 }

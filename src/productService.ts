@@ -135,15 +135,23 @@ export class ProductService {
 
   /**
    * Render product as HTML
-   * ⚠️  ISSUE: XSS vulnerability - user input not sanitized!
-   * This should use a template engine with auto-escaping
+   * ✅ Fixed: HTML escaping to prevent XSS
    */
   renderProductHTML(product: any): string {
+    const escapeHTML = (str: string): string => {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+
     return `
       <div class="product">
-        <h2>${product.name}</h2>
-        <p>${product.description}</p>
-        <span class="price">$${product.price}</span>
+        <h2>${escapeHTML(product.name)}</h2>
+        <p>${escapeHTML(product.description)}</p>
+        <span class="price">$${Number(product.price).toFixed(2)}</span>
       </div>
     `;
   }
