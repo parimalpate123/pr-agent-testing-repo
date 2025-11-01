@@ -16,13 +16,13 @@ export class ProductService {
   // SECURITY: SQL Injection vulnerability
   // PERFORMANCE: N+1 query problem
   // TESTING: No tests for empty results, null handling
-  async getProducts(category: string): Promise<(Product & {user: User})[]> {
-    // SQL INJECTION! User input directly in query 
+  async getProducts(category: string) {
+    // SQL INJECTION! User input directly in query
     const query = `SELECT * FROM products WHERE category = '${category}'`;
     const products = await this.db.query(query);
 
     // N+1 PROBLEM! Fetching user for each product separately
-    const results: (Product & {user: User})[] = [];
+    const results = [];
     for (const product of products) {
       const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
       results.push({ ...product, user });
@@ -49,9 +49,14 @@ export class ProductService {
   // CODE QUALITY: Function too long (>100 lines coming up)
   // PERFORMANCE: Inefficient algorithm O(n²)
   // TESTING: No tests for edge cases
-  async processProductBatch(data: any) {
-    // Poor variable naming
-    let tmp = [];
+  interface BatchResult {
+    tmp: Product[];
+    x: number;
+    flag: boolean;
+  }
+
+  async processProductBatch(data: Product[]): Promise<BatchResult> {
+    let tmp: Product[] = [];
     let x = 0;
     let flag = false;
 
