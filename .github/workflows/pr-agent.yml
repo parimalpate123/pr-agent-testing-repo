@@ -5,9 +5,9 @@ on:
     types: [created]
 
 permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+  contents: write      # Required for auto-fix: create branches and commit files
+  issues: write        # Required for posting comments
+  pull-requests: write # Required for creating PRs
 
 jobs:
   review:
