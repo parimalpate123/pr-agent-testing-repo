@@ -5,9 +5,9 @@ on:
     types: [created]
 
 permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+  contents: write      # Required for auto-fix: create branches and commit files
+  issues: write        # Required for posting comments
+  pull-requests: write # Required for creating PRs
 
 # 🎛️ MODEL CONFIGURATION - Change here to switch models easily
 # NOTE: All models now require inference profile format (us. prefix)
@@ -31,10 +31,11 @@ jobs:
       - name: Run PR Agent
         uses: parimalpate123/pr-code-review-action@justbedrock
         with:
+          github_token: ${{ secrets.PAT_TOKEN }}  # PAT with write permissions for auto-fix
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
-          model: ${{ env.MODEL_ID }}
+          model: us.anthropic.claude-3-5-haiku-20241022-v1:0
           bedrock_region: us-east-1
           max_tokens: "25000"
           timeout_minutes: "30"
