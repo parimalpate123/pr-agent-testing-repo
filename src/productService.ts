@@ -1,40 +1,28 @@
 import { User } from './types';
 
-interface Database {
-  query(sql: string): Promise<any>;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-  userId: number;
-  tags?: string;
-  metadata?: any;
-  script?: string;
-  command?: string;
-}
-
 // Product management service
-export class ProductService {
-  private apiKey = "FAKE_STRIPE_KEY_DO_NOT_USE_IN_PROD";
-  private db: Database;
+// Contains: Security issues, Performance problems, Missing tests, Code quality issues
 
-  constructor(database: Database) {
+export class ProductService {
+  // SECURITY: Hardcoded API key
+  private apiKey = "FAKE_STRIPE_KEY_DO_NOT_USE_IN_PROD";
+  private db: any;
+
+  // CODE QUALITY: Poor naming, unclear purpose
+  constructor(d: any) {
     this.db = d;
   }
 
   // SECURITY: SQL Injection vulnerability
   // PERFORMANCE: N+1 query problem
   // TESTING: No tests for empty results, null handling
-  async getProducts(category: string) {
-    // SQL INJECTION! User input directly in query
+  async getProducts(category: string): Promise<(Product & {user: User})[]> {
+    // SQL INJECTION! User input directly in query 
     const query = `SELECT * FROM products WHERE category = '${category}'`;
     const products = await this.db.query(query);
 
     // N+1 PROBLEM! Fetching user for each product separately
-    const results = [];
+    const results: (Product & {user: User})[] = [];
     for (const product of products) {
       const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
       results.push({ ...product, user });
