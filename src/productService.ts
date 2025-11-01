@@ -49,14 +49,9 @@ export class ProductService {
   // CODE QUALITY: Function too long (>100 lines coming up)
   // PERFORMANCE: Inefficient algorithm O(n²)
   // TESTING: No tests for edge cases
-  interface BatchResult {
-    tmp: Product[];
-    x: number;
-    flag: boolean;
-  }
-
-  async processProductBatch(data: Product[]): Promise<BatchResult> {
-    let tmp: Product[] = [];
+  async processProductBatch(data: any) {
+    // Poor variable naming
+    let tmp = [];
     let x = 0;
     let flag = false;
 
@@ -151,7 +146,7 @@ export class ProductService {
   }
 
   // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
+  validateProduct(product: Partial<Product>): boolean {
     if (!product.name || product.name.length < 3) {
       return false;
     }
