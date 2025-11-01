@@ -9,6 +9,18 @@ permissions:
   issues: write
   pull-requests: write
 
+# 🎛️ MODEL CONFIGURATION - Change here to switch models easily
+# NOTE: All models now require inference profile format (us. prefix)
+env:
+  # Primary model (uncomment one):
+  MODEL_ID: us.anthropic.claude-3-5-sonnet-20241022-v2:0  # Claude 3.5 Sonnet V2 (CURRENT - better quality)
+  # MODEL_ID: us.anthropic.claude-3-5-sonnet-20240620-v1:0  # Claude 3.5 Sonnet V1 (legacy)
+  # MODEL_ID: us.anthropic.claude-sonnet-4-20250514-v1:0  # Claude Sonnet 4 (needs subscription)
+
+  # Alternative models (for testing):
+  # MODEL_ID: us.anthropic.claude-3-haiku-20240307-v1:0     # Claude 3 Haiku (faster/cheaper)
+  # MODEL_ID: us.anthropic.claude-3-5-haiku-20241022-v1:0   # Claude 3.5 Haiku (newest fast model)
+
 jobs:
   review:
     if: github.event.issue.pull_request && contains(github.event.comment.body, '@agent')
