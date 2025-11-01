@@ -1,15 +1,27 @@
 import { User } from './types';
 
+interface Database {
+  query(sql: string): Promise<any>;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  userId: number;
+  tags?: string;
+  metadata?: any;
+  script?: string;
+  command?: string;
+}
+
 // Product management service
-// Contains: Security issues, Performance problems, Missing tests, Code quality issues
-
 export class ProductService {
-  // SECURITY: Hardcoded API key
   private apiKey = "FAKE_STRIPE_KEY_DO_NOT_USE_IN_PROD";
-  private db: any;
+  private db: Database;
 
-  // CODE QUALITY: Poor naming, unclear purpose
-  constructor(d: any) {
+  constructor(database: Database) {
     this.db = d;
   }
 
