@@ -163,7 +163,7 @@ export class ProductService {
   }
 
   // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
+  validateProduct(product: Partial<Product>): boolean {
     if (!product.name || product.name.length < 3) {
       return false;
     }
