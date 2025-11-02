@@ -6,26 +6,49 @@ import { User } from './types';
 export class ProductService {
   // SECURITY: Hardcoded API key
   private apiKey = "FAKE_STRIPE_KEY_DO_NOT_USE_IN_PROD";
-  private db: any;
 
-  // CODE QUALITY: Poor naming, unclear purpose
-  constructor(d: any) {
+  interface Database {
+    query: (query: string) => Promise<any[]>;
+  }
+
+  private db: Database;
+
+  // Typed constructor with meaningful database parameter
+  constructor(database: Database) {
     this.db = d;
   }
 
   // SECURITY: SQL Injection vulnerability
   // PERFORMANCE: N+1 query problem
   // TESTING: No tests for empty results, null handling
-  async getProducts(category: string) {
+  interface Product {
+    id: number;
+    name: string;
+    category: string;
+    userId: number;
+    price: number;
+    stock: number;
+  }
+
+  interface UserDetails {
+    id: number;
+    name: string;
+  }
+
+  interface ProductWithUser extends Product {
+    user: UserDetails;
+  }
+
+  async getProducts(category: string): Promise<ProductWithUser[]> {
     // SQL INJECTION! User input directly in query
     const query = `SELECT * FROM products WHERE category = '${category}'`;
-    const products = await this.db.query(query);
+    const products: Product[] = await this.db.query(query);
 
     // N+1 PROBLEM! Fetching user for each product separately
-    const results = [];
+    const results: ProductWithUser[] = [];
     for (const product of products) {
-      const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
-      results.push({ ...product, user });
+      const user: UserDetails[] = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
+      results.push({ ...product, user: user[0] });
     }
 
     return results;
@@ -49,9 +72,29 @@ export class ProductService {
   // CODE QUALITY: Function too long (>100 lines coming up)
   // PERFORMANCE: Inefficient algorithm O(n²)
   // TESTING: No tests for edge cases
-  async processProductBatch(data: any) {
+  interface ProductBatchItem {
+    name: string;
+    price: number;
+    stock: number;
+    script?: string;
+    command?: string;
+    metadata?: { 
+      nestedValue?: { 
+        deepProperty?: any 
+      } 
+    };
+    id: number;
+  }
+
+  interface ProcessingResult {
+    tmp: ProductBatchItem[];
+    x: number;
+    flag: boolean;
+  }
+
+  async processProductBatch(data: ProductBatchItem[]): Promise<ProcessingResult> {
     // Poor variable naming
-    let tmp = [];
+    let tmp: ProductBatchItem[] = [];
     let x = 0;
     let flag = false;
 
@@ -146,7 +189,7 @@ export class ProductService {
   }
 
   // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
+  validateProduct(product: Product): boolean {
     if (!product.name || product.name.length < 3) {
       return false;
     }
@@ -159,25 +202,15 @@ export class ProductService {
     return true;
   }
 
-  // CODE QUALITY: Another duplicate of same validation
-  isValidProduct(p: any) {
-    if (!p.name || p.name.length < 3) {
-      return false;
-    }
-    if (!p.price || p.price <= 0) {
-      return false;
-    }
-    if (!p.stock || p.stock < 0) {
-      return false;
-    }
-    return true;
-  }
+  // Reuse the same validation method to avoid duplication
+  isValidProduct = this.validateProduct;
 
   // PERFORMANCE: Memory leak - cache never cleared
-  private cache: any[] = [];
+  private cache: Product[] = [];
 
-  async getCachedProduct(id: number) {
-    this.cache.push(await this.db.query(`SELECT * FROM products WHERE id = ${id}`));
+  async getCachedProduct(id: number): Promise<Product | undefined> {
+    const product = await this.db.query(`SELECT * FROM products WHERE id = ${id}`);
+    this.cache.push(product[0]);
     return this.cache[this.cache.length - 1]; // Growing infinitely!
   }
 
