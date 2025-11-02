@@ -169,7 +169,7 @@ export class ProductService {
   }
 
   // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
+  validateProduct(product: Product): boolean {
     if (!product.name || product.name.length < 3) {
       return false;
     }
@@ -182,19 +182,8 @@ export class ProductService {
     return true;
   }
 
-  // CODE QUALITY: Another duplicate of same validation
-  isValidProduct(p: any) {
-    if (!p.name || p.name.length < 3) {
-      return false;
-    }
-    if (!p.price || p.price <= 0) {
-      return false;
-    }
-    if (!p.stock || p.stock < 0) {
-      return false;
-    }
-    return true;
-  }
+  // Remove duplicate method, keeping only one validated method
+  isValidProduct = this.validateProduct;
 
   // PERFORMANCE: Memory leak - cache never cleared
   private cache: any[] = [];
