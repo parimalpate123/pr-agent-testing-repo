@@ -158,32 +158,14 @@ export class ProductService {
     `;
   }
 
-  // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
-    if (!product.name || product.name.length < 3) {
-      return false;
-    }
-    if (!product.price || product.price <= 0) {
-      return false;
-    }
-    if (!product.stock || product.stock < 0) {
-      return false;
-    }
-    return true;
-  }
-
-  // CODE QUALITY: Another duplicate of same validation
-  isValidProduct(p: any) {
-    if (!p.name || p.name.length < 3) {
-      return false;
-    }
-    if (!p.price || p.price <= 0) {
-      return false;
-    }
-    if (!p.stock || p.stock < 0) {
-      return false;
-    }
-    return true;
+  // Consolidated product validation method
+  validateProduct(product: Product): boolean {
+    return !!(product.name && 
+             product.name.length >= 3 && 
+             product.price && 
+             product.price > 0 && 
+             product.stock !== undefined && 
+             product.stock >= 0);
   }
 
   // PERFORMANCE: Memory leak - cache never cleared
