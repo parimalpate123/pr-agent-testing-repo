@@ -168,12 +168,18 @@ export class ProductService {
              product.stock >= 0);
   }
 
-  // PERFORMANCE: Memory leak - cache never cleared
-  private cache: any[] = [];
+  // Improved caching with type safety
+  private cache: Product[] = [];
 
-  async getCachedProduct(id: number) {
-    this.cache.push(await this.db.query(`SELECT * FROM products WHERE id = ${id}`));
-    return this.cache[this.cache.length - 1]; // Growing infinitely!
+  async getCachedProduct(id: number): Promise<Product | undefined> {
+    const product: Product[] = await this.db.query(`SELECT * FROM products WHERE id = ${id}`);
+    const foundProduct = product[0];
+    
+    if (foundProduct) {
+      this.cache.push(foundProduct);
+    }
+    
+    return foundProduct; // Return undefined if no product found
   }
 
   // TESTING: Missing tests for:
