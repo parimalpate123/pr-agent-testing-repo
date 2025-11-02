@@ -29,16 +29,16 @@ export class ProductService {
   // SECURITY: SQL Injection vulnerability
   // PERFORMANCE: N+1 query problem
   // TESTING: No tests for empty results, null handling
-  async getProducts(category: string) {
+  async getProducts(category: string): Promise<(Product & { user: User })[]> {
     // SQL INJECTION! User input directly in query
     const query = `SELECT * FROM products WHERE category = '${category}'`;
-    const products = await this.db.query(query);
+    const products: Product[] = await this.db.query(query);
 
     // N+1 PROBLEM! Fetching user for each product separately
-    const results = [];
+    const results: (Product & { user: User })[] = [];
     for (const product of products) {
-      const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
-      results.push({ ...product, user });
+      const user: User[] = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
+      results.push({ ...product, user: user[0] });
     }
 
     return results;
@@ -46,14 +46,14 @@ export class ProductService {
 
   // CODE QUALITY: Duplicate code (similar to above)
   // PERFORMANCE: Same N+1 issue
-  async getFeaturedProducts(tag: string) {
+  async getFeaturedProducts(tag: string): Promise<(Product & { user: User })[]> {
     const query = `SELECT * FROM products WHERE tags LIKE '%${tag}%'`; // SQL INJECTION again!
-    const products = await this.db.query(query);
+    const products: Product[] = await this.db.query(query);
 
-    const results = [];
+    const results: (Product & { user: User })[] = [];
     for (const product of products) {
-      const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
-      results.push({ ...product, user });
+      const user: User[] = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
+      results.push({ ...product, user: user[0] });
     }
 
     return results;
