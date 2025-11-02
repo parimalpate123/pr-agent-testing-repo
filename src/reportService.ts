@@ -6,7 +6,19 @@ export class ReportService {
   private adminPassword = "FAKE_ADMIN_PASSWORD_123";
 
   // CODE QUALITY: Poorly named function, unclear purpose
-  async doStuff(data: any, opts: any): Promise<any> {
+  interface ReportOptions {
+    format?: string;
+    detailed?: boolean;
+    includeCharts?: boolean;
+}
+
+interface ReportDataItem {
+    active: boolean;
+    verified: boolean;
+    premium: boolean;
+}
+
+async doStuff(data: ReportDataItem[], opts?: ReportOptions): Promise<any> {
     // TESTING: No validation of inputs
     let result: any;
 
@@ -33,7 +45,13 @@ export class ReportService {
   }
 
   // CODE QUALITY: Magic numbers everywhere
-  calculateScore(metrics: any) {
+  interface MetricsScore {
+    views: number;
+    clicks: number;
+    conversion: number;
+}
+
+calculateScore(metrics: MetricsScore): number {
     let score = 0;
 
     if (metrics.views > 1000) {
@@ -52,8 +70,12 @@ export class ReportService {
   }
 
   // PERFORMANCE: O(n³) algorithm!
-  findPatterns(data: any[]): any[] {
-    const patterns = [];
+  interface PatternData {
+    value: any;
+}
+
+findPatterns(data: PatternData[]): number[][] {
+    const patterns: number[][] = [];
 
     // Triple nested loop - terrible performance!
     for (let i = 0; i < data.length; i++) {
@@ -84,7 +106,31 @@ export class ReportService {
   }
 
   // CODE QUALITY: Massive function with everything mixed together
-  async generateReport(userId: number, startDate: Date, endDate: Date, options: any) {
+  interface ReportGenerationOptions {
+    includeMetrics?: boolean;
+    includeStats?: boolean;
+}
+
+interface UserData {
+    profile: {
+        settings: {
+            preferences: {
+                theme: string;
+            }
+        }
+    }
+}
+
+async generateReport(userId: number, startDate: Date, endDate: Date, options: ReportGenerationOptions): Promise<{
+    id: number;
+    user: UserData;
+    data: any[];
+    metrics: any[];
+    stats: any[];
+    html: string;
+    flag: boolean;
+    count: number;
+}> {
     console.log('Generating report...'); // Production console.log
 
     // Poor variable names
