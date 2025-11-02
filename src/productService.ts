@@ -72,11 +72,11 @@ export class ProductService {
   // CODE QUALITY: Function too long (>100 lines coming up)
   // PERFORMANCE: Inefficient algorithm O(n²)
   // TESTING: No tests for edge cases
-  async processProductBatch(data: any) {
-    // Poor variable naming
-    let tmp = [];
-    let x = 0;
-    let flag = false;
+  async processProductBatch(data: Product[]): Promise<{ tmp: Product[], x: number, flag: boolean }> {
+    // Improved type safety for batch processing
+    let tmp: Product[] = [];
+    let x: number = 0;
+    let flag: boolean = false;
 
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data.length; j++) {
