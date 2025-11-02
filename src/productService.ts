@@ -6,10 +6,15 @@ import { User } from './types';
 export class ProductService {
   // SECURITY: Hardcoded API key
   private apiKey = "FAKE_STRIPE_KEY_DO_NOT_USE_IN_PROD";
-  private db: any;
 
-  // CODE QUALITY: Poor naming, unclear purpose
-  constructor(d: any) {
+  interface DatabaseConnection {
+    query: (query: string) => Promise<any[]>;
+  }
+
+  private db: DatabaseConnection;
+
+  // CODE QUALITY: Improved type safety for database connection
+  constructor(database: DatabaseConnection) {
     this.db = d;
   }
 
