@@ -21,16 +21,34 @@ export class ProductService {
   // SECURITY: SQL Injection vulnerability
   // PERFORMANCE: N+1 query problem
   // TESTING: No tests for empty results, null handling
-  async getProducts(category: string) {
+  interface Product {
+    id: number;
+    name: string;
+    category: string;
+    userId: number;
+    price: number;
+    stock: number;
+  }
+
+  interface UserDetails {
+    id: number;
+    name: string;
+  }
+
+  interface ProductWithUser extends Product {
+    user: UserDetails;
+  }
+
+  async getProducts(category: string): Promise<ProductWithUser[]> {
     // SQL INJECTION! User input directly in query
     const query = `SELECT * FROM products WHERE category = '${category}'`;
-    const products = await this.db.query(query);
+    const products: Product[] = await this.db.query(query);
 
     // N+1 PROBLEM! Fetching user for each product separately
-    const results = [];
+    const results: ProductWithUser[] = [];
     for (const product of products) {
-      const user = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
-      results.push({ ...product, user });
+      const user: UserDetails[] = await this.db.query(`SELECT * FROM users WHERE id = ${product.userId}`);
+      results.push({ ...product, user: user[0] });
     }
 
     return results;
