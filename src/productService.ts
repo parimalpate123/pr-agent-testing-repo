@@ -1,5 +1,18 @@
 import { User } from './types';
 
+// Interfaces for product and related types
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  userId: number;
+  category?: string;
+  tags?: string[];
+  script?: string;
+  command?: string;
+}
+
 // Product management service
 // Contains: Security issues, Performance problems, Missing tests, Code quality issues
 
