@@ -189,7 +189,7 @@ export class ProductService {
   }
 
   // CODE QUALITY: Duplicate validation logic (appears in multiple places)
-  validateProduct(product: any) {
+  validateProduct(product: Product): boolean {
     if (!product.name || product.name.length < 3) {
       return false;
     }
@@ -202,25 +202,15 @@ export class ProductService {
     return true;
   }
 
-  // CODE QUALITY: Another duplicate of same validation
-  isValidProduct(p: any) {
-    if (!p.name || p.name.length < 3) {
-      return false;
-    }
-    if (!p.price || p.price <= 0) {
-      return false;
-    }
-    if (!p.stock || p.stock < 0) {
-      return false;
-    }
-    return true;
-  }
+  // Reuse the same validation method to avoid duplication
+  isValidProduct = this.validateProduct;
 
   // PERFORMANCE: Memory leak - cache never cleared
-  private cache: any[] = [];
+  private cache: Product[] = [];
 
-  async getCachedProduct(id: number) {
-    this.cache.push(await this.db.query(`SELECT * FROM products WHERE id = ${id}`));
+  async getCachedProduct(id: number): Promise<Product | undefined> {
+    const product = await this.db.query(`SELECT * FROM products WHERE id = ${id}`);
+    this.cache.push(product[0]);
     return this.cache[this.cache.length - 1]; // Growing infinitely!
   }
 
