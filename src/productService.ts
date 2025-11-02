@@ -72,9 +72,29 @@ export class ProductService {
   // CODE QUALITY: Function too long (>100 lines coming up)
   // PERFORMANCE: Inefficient algorithm O(n²)
   // TESTING: No tests for edge cases
-  async processProductBatch(data: any) {
+  interface ProductBatchItem {
+    name: string;
+    price: number;
+    stock: number;
+    script?: string;
+    command?: string;
+    metadata?: { 
+      nestedValue?: { 
+        deepProperty?: any 
+      } 
+    };
+    id: number;
+  }
+
+  interface ProcessingResult {
+    tmp: ProductBatchItem[];
+    x: number;
+    flag: boolean;
+  }
+
+  async processProductBatch(data: ProductBatchItem[]): Promise<ProcessingResult> {
     // Poor variable naming
-    let tmp = [];
+    let tmp: ProductBatchItem[] = [];
     let x = 0;
     let flag = false;
 
