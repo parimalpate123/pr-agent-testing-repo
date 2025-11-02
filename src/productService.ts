@@ -186,11 +186,12 @@ export class ProductService {
   isValidProduct = this.validateProduct;
 
   // PERFORMANCE: Memory leak - cache never cleared
-  private cache: any[] = [];
+  private cache: Product[] = [];
 
-  async getCachedProduct(id: number) {
-    this.cache.push(await this.db.query(`SELECT * FROM products WHERE id = ${id}`));
-    return this.cache[this.cache.length - 1]; // Growing infinitely!
+  async getCachedProduct(id: number): Promise<Product> {
+    const product: Product = await this.db.query(`SELECT * FROM products WHERE id = ${id}`);
+    this.cache.push(product);
+    return product; // Returning most recently fetched product
   }
 
   // TESTING: Missing tests for:
